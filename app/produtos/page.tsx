@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
-import { produtos } from "../data/produtos";
+import { Produto } from "../data/produtos";
+import { getProdutos } from "../data/getProdutos";
 
 const categorias = [
   "Todos",
@@ -20,9 +21,14 @@ function converterPreco(preco: string) {
 }
 
 export default function ProdutosPage() {
+  const [produtos, setProdutos] = useState<Produto[]>([]);
   const [busca, setBusca] = useState("");
   const [categoriaSelecionada, setCategoriaSelecionada] = useState("Todos");
   const [ordenacao, setOrdenacao] = useState("padrao");
+
+  useEffect(() => {
+    setProdutos(getProdutos());
+  }, []);
 
   const produtosFiltrados = produtos
     .filter((produto) => {
@@ -54,7 +60,7 @@ export default function ProdutosPage() {
 
   return (
     <main className="min-h-screen bg-white text-black">
-      <section className="px-4 py-8 md:px-8 md:py-10">
+      <section className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-10">
         <a href="/" className="mb-6 inline-block rounded-lg border px-4 py-2">
           ← Voltar
         </a>

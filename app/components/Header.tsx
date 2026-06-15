@@ -8,10 +8,15 @@ type ProdutoCarrinho = {
 
 export default function Header() {
   const [quantidade, setQuantidade] = useState(0);
+  const [favoritos, setFavoritos] = useState(0);
 
-  function atualizarQuantidade() {
+  function atualizarDados() {
     const carrinho: ProdutoCarrinho[] = JSON.parse(
       localStorage.getItem("carrinho") || "[]"
+    );
+
+    const favoritosSalvos = JSON.parse(
+      localStorage.getItem("favoritos") || "[]"
     );
 
     const totalItens = carrinho.reduce((total, item) => {
@@ -19,17 +24,20 @@ export default function Header() {
     }, 0);
 
     setQuantidade(totalItens);
+    setFavoritos(favoritosSalvos.length);
   }
 
   useEffect(() => {
-    atualizarQuantidade();
+    atualizarDados();
 
-    window.addEventListener("storage", atualizarQuantidade);
-    window.addEventListener("carrinhoAtualizado", atualizarQuantidade);
+    window.addEventListener("storage", atualizarDados);
+    window.addEventListener("carrinhoAtualizado", atualizarDados);
+    window.addEventListener("favoritosAtualizado", atualizarDados);
 
     return () => {
-      window.removeEventListener("storage", atualizarQuantidade);
-      window.removeEventListener("carrinhoAtualizado", atualizarQuantidade);
+      window.removeEventListener("storage", atualizarDados);
+      window.removeEventListener("carrinhoAtualizado", atualizarDados);
+      window.removeEventListener("favoritosAtualizado", atualizarDados);
     };
   }, []);
 
@@ -49,11 +57,15 @@ export default function Header() {
             Produtos
           </a>
 
+          <a href="/favoritos" className="transition hover:text-gray-500">
+            ❤️ Favoritos ({favoritos})
+          </a>
+
           <a
             href="/carrinho"
             className="rounded-full bg-black px-4 py-2 text-white transition hover:bg-gray-800"
           >
-            Carrinho ({quantidade})
+            🛒 Carrinho ({quantidade})
           </a>
         </nav>
       </div>

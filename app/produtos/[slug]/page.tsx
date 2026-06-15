@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import ProductCard from "../../components/ProductCard";
-import { produtos } from "../../data/produtos";
+import Toast from "../../components/Toast";
+import { Produto } from "../../data/produtos";
+import { getProdutos } from "../../data/getProdutos";
 
 type ProdutoCarrinho = {
   nome: string;
@@ -19,7 +21,18 @@ type ProdutoCarrinho = {
 export default function ProdutoPage() {
   const params = useParams();
   const slug = params.slug as string;
+
+  const [produtos, setProdutos] = useState<Produto[]>([]);
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState("");
+  const [toast, setToast] = useState("");
+
+  useEffect(() => {
+    setProdutos(getProdutos());
+  }, []);
+
+  if (produtos.length === 0) {
+    return <main className="p-8">Carregando...</main>;
+  }
 
   const produtoEncontrado = produtos.find((item) => item.slug === slug);
 
@@ -29,21 +42,32 @@ export default function ProdutoPage() {
 
   const produto = produtoEncontrado;
 
-  const relacionados = produtos
-    .filter(
-      (item) =>
-        item.categoria === produto.categoria && item.slug !== produto.slug
-    )
+  const relacionados = [...produtos]
+    .filter((item) => item.slug !== produto.slug)
+    .sort((a, b) => {
+      const valorA = a.slug.charCodeAt(0) + produto.slug.length;
+      const valorB = b.slug.charCodeAt(0) + produto.slug.length;
+
+      return valorA - valorB;
+    })
     .slice(0, 3);
+
+  function mostrarToast(mensagem: string) {
+    setToast(mensagem);
+
+    setTimeout(() => {
+      setToast("");
+    }, 2500);
+  }
 
   function adicionarAoCarrinho() {
     if (produto.estoque <= 0) {
-      alert("Produto sem estoque.");
+      mostrarToast("Produto sem estoque.");
       return;
     }
 
     if (!tamanhoSelecionado) {
-      alert("Selecione um tamanho.");
+      mostrarToast("Selecione um tamanho.");
       return;
     }
 
@@ -81,14 +105,16 @@ export default function ProdutoPage() {
     localStorage.setItem("carrinho", JSON.stringify(novoCarrinho));
     window.dispatchEvent(new Event("carrinhoAtualizado"));
 
-    alert("Produto adicionado ao carrinho!");
+    mostrarToast("Produto adicionado ao carrinho.");
   }
 
   return (
     <main className="min-h-screen bg-white text-black">
       <Header />
 
-      <section className="grid grid-cols-1 gap-8 px-4 py-8 md:grid-cols-2 md:px-8 md:py-10">
+      {toast && <Toast mensagem={toast} />}
+
+      <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-8 md:grid-cols-2 md:px-8 md:py-10">
         <img
           src={produto.imagem}
           alt={produto.nome}
@@ -181,8 +207,10 @@ export default function ProdutoPage() {
       </section>
 
       {relacionados.length > 0 && (
-        <section className="px-4 py-12 md:px-8">
-          <h2 className="mb-6 text-3xl font-bold">Você também pode gostar</h2>
+        <section className="mx-auto max-w-6xl px-4 py-12 md:px-8">
+          <h2 className="mb-6 text-3xl font-bold">
+            Produtos que podem te interessar
+          </h2>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {relacionados.map((item) => (

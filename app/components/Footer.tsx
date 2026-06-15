@@ -11,15 +11,18 @@ export default function Footer() {
 
         <div>
           <h3 className="mb-3 font-semibold">Navegação</h3>
+
           <div className="flex flex-col gap-2 text-sm text-gray-600">
             <a href="/">Início</a>
             <a href="/produtos">Produtos</a>
             <a href="/carrinho">Carrinho</a>
+            <a href="/favoritos">Favoritos</a>
           </div>
         </div>
 
         <div>
           <h3 className="mb-3 font-semibold">Atendimento</h3>
+
           <div className="flex flex-col gap-2 text-sm text-gray-600">
             <span>Segunda a sexta</span>
             <span>09h às 18h</span>
@@ -28,8 +31,15 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="mx-auto mt-8 max-w-6xl border-t pt-4 text-center text-sm text-gray-500">
-        © 2026 Loja Roupas. Todos os direitos reservados.
+      <div className="mx-auto mt-8 flex max-w-6xl flex-col items-center gap-2 border-t pt-4 text-center text-sm text-gray-500">
+        <span>© 2026 Loja Roupas. Todos os direitos reservados.</span>
+
+        <a
+          href="/admin/login"
+          className="text-xs text-gray-400 transition hover:text-black"
+        >
+          Painel Administrativo
+        </a>
       </div>
     </footer>
   );
